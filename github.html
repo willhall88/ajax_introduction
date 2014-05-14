@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AJAX learning</title>
+   <link href='github.css' rel='stylesheet'>
+   <meta charset='utf-8'>
+</head>
+<body>
+   <form class='search'>
+     <input id='username' type="text" name="search" placeholder="Enter a username">
+     <button type='submit'>Load profile</button>
+   </form>
+
+  
+  <div class='profile-container'>
+    <template id='profile-template'>
+      <div class='profile'>
+        
+        <section class='left'>
+          <img src="{{avatar_url}}">
+        </section>
+
+        <section class='right'>
+          <h3><a href="{{ url }}"> {{login}}</a></h3>
+          <h4>Repos: {{public_repos}}</h4>
+          <h4>Followers: {{followers}}</h4>
+        </section>
+        
+        <a class='close' href='#'>✖</a>
+
+
+      </div>
+    </template>
+  </div>
+    <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="mustache.js"></script>
+     <script>
+
+      function addProfile(username){
+        $.get('https://api.github.com/users/' + username, function(user) {
+          var newProfile = Mustache.render($('#profile-template').html(), user);
+          $(newProfile).prependTo('.profile-container').slideDown();
+        }).fail(function(){
+          alert('user not found')
+        }).always(function(){
+          $('#username').val('');
+        })
+      }
+      $(document).ready(function() {
+        var usernames = ['alexmakers', 'ecomba', 'ajcumine'];
+
+        usernames.forEach(function(username){
+          addProfile(username);
+        })
+
+        $('.profile-container').on('click', '.close', function(){
+          $(this).closest('.profile').remove();
+        })
+        
+        $('.search').on('submit', function(event){
+          event.preventDefault();
+          var usernameEntered = $("#username").val();
+          addProfile(usernameEntered);
+        });
+      });
+    </script>
+
+</body>
+</html>
